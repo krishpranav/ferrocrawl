@@ -1,0 +1,36 @@
+[crawler]
+concurrency     = 200
+depth           = 3
+request_timeout = 30
+user_agent      = "ferrocrawl/0.1 (+https://github.com/yourusername/ferrocrawl)"
+
+[scheduler]
+max_queue_size = 1_000_000
+priority_mode  = "breadth"
+
+[dedup]
+bloom_capacity = 10_000_000
+bloom_fpr      = 0.001
+
+[rate_limiter]
+default_rps = 10
+burst       = 20
+
+[proxy]
+enabled  = false
+rotation = "round_robin"
+proxies  = []
+
+[export]
+sink        = "ndjson"
+output_dir  = "./output"
+parquet_batch = 50_000
+
+[redis]
+url            = "redis://localhost:6379"
+stream         = "fc:jobs"
+consumer_group = "workers"
+
+[api]
+host = "0.0.0.0"
+port = 8080

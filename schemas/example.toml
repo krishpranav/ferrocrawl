@@ -1,0 +1,18 @@
+[[extractor]]
+name        = "article"
+url_pattern = ".*"
+
+[[extractor.fields]]
+name     = "title"
+selector = "h1"
+attr     = "text"
+
+[[extractor.fields]]
+name     = "description"
+selector = "meta[name='description']"
+attr     = "content"
+
+[[extractor.fields]]
+name     = "canonical_url"
+selector = "link[rel='canonical']"
+attr     = "href"

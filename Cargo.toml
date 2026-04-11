@@ -1,0 +1,83 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fc-core",
+    "crates/fc-engine",
+    "crates/fc-scheduler",
+    "crates/fc-export",
+    "crates/fc-api",
+    "crates/fc-solana",
+    "crates/fc-cli",
+]
+
+[workspace.dependencies]
+# Async runtime
+tokio        = { version = "1.37", features = ["full"] }
+tokio-util   = { version = "0.7" }
+
+# HTTP
+reqwest      = { version = "0.12", features = ["brotli", "gzip", "http2", "json", "rustls-tls"], default-features = false }
+hyper        = { version = "1.3", features = ["full"] }
+
+# HTML parsing
+scraper      = "0.19"
+
+# Web framework
+axum         = { version = "0.7", features = ["macros"] }
+tower        = "0.4"
+tower-http   = { version = "0.5", features = ["trace", "auth"] }
+
+# Serialization
+serde        = { version = "1", features = ["derive"] }
+serde_json   = "1"
+
+# Configuration
+config       = "0.14"
+toml         = "0.8"
+
+# Bloom filter
+bloomfilter  = "1.0"
+
+# Rate limiting
+governor     = "0.6"
+
+# Redis
+fred         = { version = "9", features = ["tokio-runtime"] }
+
+# Parquet / Arrow
+arrow2       = { version = "0.18", features = ["io_parquet", "io_parquet_compression"] }
+parquet2     = "0.17"
+
+# CLI
+clap         = { version = "4", features = ["derive", "env"] }
+
+# Observability
+tracing               = "0.1"
+tracing-subscriber    = { version = "0.3", features = ["env-filter", "json"] }
+metrics               = "0.22"
+metrics-exporter-prometheus = "0.13"
+
+# Error handling
+thiserror    = "1"
+anyhow       = "1"
+
+# Utilities
+futures      = "0.3"
+async-trait  = "0.1"
+uuid         = { version = "1", features = ["v4"] }
+chrono       = { version = "0.4", features = ["serde"] }
+url          = { version = "2", features = ["serde"] }
+regex        = "1"
+bytes        = "1"
+dashmap      = "5"
+crossbeam-channel = "0.5"
+
+# Solana
+solana-client     = "1.18"
+solana-sdk        = "1.18"
+borsh             = "1"
+
+# Testing
+tokio-test   = "0.4"
+wiremock     = "0.6"
+criterion    = { version = "0.5", features = ["html_reports"] }
