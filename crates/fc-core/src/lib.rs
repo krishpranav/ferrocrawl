@@ -1,6 +1,6 @@
-mod error;
-mod types;
-
+pub mod error;
+pub mod traits;
+pub mod types;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
