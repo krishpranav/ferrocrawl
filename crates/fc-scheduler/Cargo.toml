@@ -1,6 +1,24 @@
 [package]
-name = "fc-scheduler"
-version = "0.1.0"
-edition = "2024"
+name        = "fc-scheduler"
+version     = "0.1.0"
+edition     = "2021"
+authors     = ["ferrocrawl contributors"]
+description = "Frontier queue, Bloom dedup, rate limiting, and proxy pool for ferrocrawl"
+license     = "MIT"
 
 [dependencies]
+fc-core = { path = "../fc-core" }
+
+tokio        = { workspace = true }
+async-trait  = { workspace = true }
+serde        = { workspace = true }
+url          = { workspace = true }
+tracing      = { workspace = true }
+dashmap      = { workspace = true }
+thiserror    = { workspace = true }
+
+bloomfilter  = { workspace = true }
+governor     = { version = "0.6", features = ["tokio"] }
+
+[dev-dependencies]
+tokio-test = { workspace = true }
