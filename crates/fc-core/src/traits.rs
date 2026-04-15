@@ -30,3 +30,35 @@ pub trait Fetcher: Send + Sync + 'static {
 
     fn name(&self) -> &'static str;
 }
+
+#[async_trait]
+pub trait Extractor: Send + Sync + 'static {
+    fn matches(&self, response: &FetchResponse) -> bool;
+
+    async fn extract(&self, response: &FetchResponse) -> Result<ExtractedRecord>;
+
+    fn scheme_name(&self) -> str;
+}
+
+#[async_trait]
+pub trait Sink: Send + Sync + 'static {
+    async fn write(&self, record: ExtractedRecord) -> Result<()>;
+
+    async fn flush(&self) -> Result<()>;
+
+    fn name(&self) -> &'static str;
+}
+
+pub trait DedupFilter: Send + Sync + 'static {
+    fn check_and_insert(&self, url: &str) -> bool;
+
+    fn contains(&self, url: &str) -> bool;
+
+    fn fill_ratio(&self) -> f64;
+
+    fn len(&self) -> u64;
+
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
