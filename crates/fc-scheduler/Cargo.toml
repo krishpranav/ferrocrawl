@@ -18,7 +18,7 @@ dashmap      = { workspace = true }
 thiserror    = { workspace = true }
 
 bloomfilter  = { workspace = true }
-governor     = { version = "0.6", features = ["tokio"] }
+governor = { workspace = true }
 
 [dev-dependencies]
 tokio-test = { workspace = true }

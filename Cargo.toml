@@ -39,7 +39,7 @@ toml         = "0.8"
 bloomfilter  = "1.0"
 
 # Rate limiting
-governor     = "0.6"
+governor = { version = "0.6", features = ["std", "futures"] }
 
 # Redis
 fred         = { version = "9", features = ["tokio-runtime"] }

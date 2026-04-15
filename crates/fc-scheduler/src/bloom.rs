@@ -23,3 +23,10 @@
 //! `std::sync::RwLock`, so concurrent calls to `check_and_insert` are safe.
 //! The insertion count is tracked with an `AtomicU64` so fill-ratio queries
 //! never need the write lock.
+
+use bloomfilter::Bloom;
+use fc_core::traits::DedupFilter;
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    RwLock,
+};
