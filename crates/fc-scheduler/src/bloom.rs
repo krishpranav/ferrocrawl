@@ -30,3 +30,44 @@ use std::sync::{
     atomic::{AtomicU64, Ordering},
     RwLock,
 };
+
+pub struct BloomDedupFilter {
+    inner: RwLock<Bloom<String>>,
+    count: AtomicU64,
+    capacity: usize,
+}
+
+impl BloomDedupFilter {
+    pub fn new(capacity: usize, fpr: f64) -> Self {
+        assert!(capacity > 0, "bloom capacity must be positive");
+        assert!(
+            fpr > 0.0 && fpr < 1.0,
+            "bloom false-positive rate must be in (0.0, 1.0)"
+        );
+
+        Self {
+            inner: RwLock::new(Bloom::new_for_fp_rate(capacity, fpr)),
+            count: AtomicU64::new(0),
+            capacity,
+        }
+    }
+
+    #[inline]
+    pub fn count(&self) -> u64 {
+        self.count.load(Ordering::Relaxed)
+    }
+}
+
+unsafe impl Send for BloomDedupFilter {}
+unsafe impl Sync for BloomDedupFilter {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{sync::Arc, thread};
+
+    #[test]
+    fn insert_and_check() {
+        let f = BloomDedupFilter::new(1_000, 0.0001);
+    }
+}
