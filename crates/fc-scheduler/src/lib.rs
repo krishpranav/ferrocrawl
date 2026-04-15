@@ -21,3 +21,5 @@
 //! implementation of the same [`Scheduler`][fc_core::traits::Scheduler] trait.
 
 pub mod bloom;
+
+pub use bloom::BloomDedupFilter;
