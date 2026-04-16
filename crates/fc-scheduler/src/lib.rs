@@ -22,5 +22,6 @@
 
 pub mod bloom;
 pub mod frontier;
+pub mod rate_limiter;
 
 pub use bloom::BloomDedupFilter;
