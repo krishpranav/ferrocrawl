@@ -22,6 +22,10 @@
 
 pub mod bloom;
 pub mod frontier;
+pub mod proxy;
 pub mod rate_limiter;
 
 pub use bloom::BloomDedupFilter;
+pub use frontier::LocalFrontier;
+pub use proxy::ProxyPool;
+pub use rate_limiter::DomainRateLimiter;
