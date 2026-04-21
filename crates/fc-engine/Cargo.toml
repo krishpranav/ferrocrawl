@@ -1,6 +1,30 @@
 [package]
-name = "fc-engine"
-version = "0.1.0"
-edition = "2024"
+name        = "fc-engine"
+version     = "0.1.0"
+edition     = "2021"
+authors     = ["ferrocrawl contributors"]
+description = "Async HTTP fetcher, HTML parser, and schema-driven extractor for ferrocrawl"
+license     = "MIT"
 
 [dependencies]
+fc-core = { path = "../fc-core" }
+fc-scheduler = { path = "../fc-scheduler" }
+
+tokio        = { workspace = true }
+async-trait  = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
+tracing      = { workspace = true }
+thiserror    = { workspace = true }
+bytes        = { workspace = true }
+url          = { workspace = true }
+regex        = { workspace = true }
+toml         = { workspace = true }
+futures      = { workspace = true }
+
+reqwest      = { workspace = true }
+scraper      = { workspace = true }
+
+[dev-dependencies]
+tokio-test   = { workspace = true }
+wiremock     = { workspace = true }
