@@ -68,6 +68,8 @@ pub struct HttpFetcher {
 
     /// Maximum response body size (bytes). Bodies exceeding this are truncated.
     max_body_bytes: usize,
+
+    cfg: CoreConfig,
 }
 
 impl HttpFetcher {
@@ -118,7 +120,6 @@ impl HttpFetcher {
             .tcp_nodelay(true)
             .gzip(true)
             .brotli(true)
-            .deflate(true)
             .build()
             .map_err(|e| CrawlError::Config(format!("failed to build HTTP client: {e}")))?;
 
@@ -126,6 +127,7 @@ impl HttpFetcher {
             client,
             proxy_pool,
             max_body_bytes: cfg.max_body_bytes,
+            cfg: cfg.clone(),
         })
     }
 
@@ -191,24 +193,6 @@ impl Fetcher for HttpFetcher {
         // ── Build the request ─────────────────────────────────────────────
         let mut request_builder = self.client.get(job.url.as_str());
 
-        // Inject proxy if available. We build a one-shot client with the
-        // proxy configured since reqwest doesn't support per-request proxies
-        // directly. This has minimal overhead — the proxy client reuses the
-        // same TLS roots and shares no connection pool with the base client.
-        let proxy_url = self.select_proxy(domain);
-        let _proxy_client;
-        if let Some(ref proxy) = proxy_url {
-            let proxy_obj = reqwest::Proxy::all(proxy.as_str())
-                .map_err(|e| CrawlError::Config(format!("invalid proxy URL: {e}")))?;
-
-            _proxy_client = self
-                .client
-                .clone(); // still references the same pool; proxy is per-builder only
-
-            request_builder = self.client.get(job.url.as_str()).proxy(proxy_obj);
-            debug!(proxy = proxy, "using proxy");
-        }
-
         // Propagate referrer if available.
         if let Some(ref referrer) = job.referrer {
             request_builder = request_builder.header(
@@ -218,14 +202,36 @@ impl Fetcher for HttpFetcher {
             );
         }
 
+        let proxy_url = self.select_proxy(domain);
+
         // ── Execute ───────────────────────────────────────────────────────
         let start = Instant::now();
 
-        let response = request_builder.send().await.map_err(|e| {
+        let response = if let Some(ref proxy) = proxy_url {
+            debug!(proxy = proxy, "using proxy");
+            let proxy_obj = reqwest::Proxy::all(proxy.as_str())
+                .map_err(|e| CrawlError::Config(format!("invalid proxy URL: {e}")))?;
+
+            let proxied_client = ClientBuilder::new()
+                .timeout(self.cfg.request_timeout())
+                .redirect(Policy::limited(self.cfg.max_redirects as usize))
+                .use_rustls_tls()
+                .gzip(true)
+                .brotli(true)
+                .proxy(proxy_obj)
+                .build()
+                .map_err(|e| CrawlError::Config(format!("failed to build proxy client: {e}")))?;
+
+            proxied_client.get(job.url.as_str()).send().await
+        } else {
+            request_builder.send().await
+        };
+
+        let response = response.map_err(|e| {
             if e.is_timeout() {
                 CrawlError::Timeout {
                     url: url_str.to_owned(),
-                    timeout_secs: 30,
+                    timeout_secs: self.cfg.request_timeout_secs,
                 }
             } else if e.is_redirect() {
                 CrawlError::TooManyRedirects { url: url_str.to_owned() }
